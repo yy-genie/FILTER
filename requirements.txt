@@ -1,0 +1,10 @@
+streamlit
+torch
+torchvision
+pillow
+numpy
+pandas
+plotly
+matplotlib
+scikit-image
+streamlit-option-menu
