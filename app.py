@@ -16,6 +16,8 @@ from skimage.metrics import structural_similarity as ssim
 import os
 import requests
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 MODEL_TAG = "v1.0"  # Release 생성 시 쓰신 태그명
 MODEL_URL = f"https://github.com/yy-genie/FILTER/releases/download/{MODEL_TAG}/yjmodel.pth"
 MODEL_PATH = "yjmodel.pth"
@@ -40,8 +42,6 @@ def load_model_from_release():
 
 # 기존 load_model() 대신
 model = load_model_from_release()
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 st.markdown(
     """
     <div style="display: flex; align-items: baseline; gap: 0.5rem;">
