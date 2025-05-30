@@ -13,6 +13,33 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 from skimage.metrics import structural_similarity as ssim
+import os
+import requests
+
+MODEL_TAG = "v1.0"  # Release 생성 시 쓰신 태그명
+MODEL_URL = f"https://github.com/yy-genie/FILTER/releases/download/{MODEL_TAG}/yjmodel.pth"
+MODEL_PATH = "yjmodel.pth"
+
+@st.cache_resource(show_spinner=False)
+def load_model_from_release():
+    # 1) 로컬에 없으면 다운로드
+    if not os.path.exists(MODEL_PATH):
+        with st.spinner("모델 다운로드 중…"):
+            r = requests.get(MODEL_URL, stream=True)
+            r.raise_for_status()
+            with open(MODEL_PATH, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1_000_000):
+                    f.write(chunk)
+    # 2) 로드
+    model = models.resnet18(pretrained=False)
+    num_features = model.fc.in_features
+    model.fc = nn.Linear(num_features, 2)
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    model.eval().to(device)
+    return model
+
+# 기존 load_model() 대신
+model = load_model_from_release()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 st.markdown(
