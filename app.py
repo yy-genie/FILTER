@@ -13,35 +13,8 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 from skimage.metrics import structural_similarity as ssim
-import os
-import requests
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-MODEL_TAG = "v1.0"  # Release 생성 시 쓰신 태그명
-MODEL_URL = f"https://github.com/yy-genie/FILTER/releases/download/{MODEL_TAG}/yjmodel.pth"
-MODEL_PATH = "yjmodel.pth"
-
-@st.cache_resource(show_spinner=False)
-def load_model_from_release():
-    # 1) 로컬에 없으면 다운로드
-    if not os.path.exists(MODEL_PATH):
-        with st.spinner("모델 다운로드 중…"):
-            r = requests.get(MODEL_URL, stream=True)
-            r.raise_for_status()
-            with open(MODEL_PATH, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1_000_000):
-                    f.write(chunk)
-    # 2) 로드
-    model = models.resnet18(pretrained=False)
-    num_features = model.fc.in_features
-    model.fc = nn.Linear(num_features, 2)
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-    model.eval().to(device)
-    return model
-
-# 기존 load_model() 대신
-model = load_model_from_release()
 st.markdown(
     """
     <div style="display: flex; align-items: baseline; gap: 0.5rem;">
@@ -199,7 +172,28 @@ selected = option_menu(
 # 각 페이지
 def show_home():
     st.markdown("## 🏠 Home")
-    st.markdown("##### 대충 그림이랑 설명.. 들어갈 자리!!")
+    st.markdown("##### \"딥페이크 방어를 위한 이미지 전처리 솔루션\"")
+    st.markdown("\n")
+    st.markdown("### 🔍 How to use?")
+    st.markdown("###### 1. Upload 탭에서 이용할 이미지 입력")
+    st.markdown("###### 2. 결과 이미지 확인 후 Download")
+    st.markdown("###### 3. 해당 이미지 사용으로 딥페이크 방어")
+    st.markdown("\n")
+    image_1 = Image.open('/Users/PKNU/Desktop/project/5.png')
+    image_2 = Image.open('/Users/PKNU/Desktop/project/5.png')
+
+    col1, col2 = st.columns(2)
+
+    # 첫 번째 열에 이미지 넣기
+    with col1:
+        st.image(image_1, caption="Before", use_container_width=True)
+
+    # 두 번째 열에 이미지 넣기
+    with col2:
+        st.image(image_2, caption="After", use_container_width=True)
+        
+    st.markdown("<h5 style='text-align: center; font-size: 15px;'>\"이미지 손상 없는 프로그램\"</h5>", unsafe_allow_html=True)
+
 
 def show_upload():
     st.markdown("## ☁️ Upload")
@@ -210,7 +204,6 @@ def show_upload():
         inp = transform(pil).unsqueeze(0).to(device)
         orig_pred = model(inp).argmax(1).item()
 
-        # 공격 실행
         adv_tensor, used_eps, achieved_ssim = adaptive_pgd_attack(model, inp, orig_pred)
 
         def tensor_to_np(t: torch.Tensor):
