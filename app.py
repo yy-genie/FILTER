@@ -179,8 +179,8 @@ def show_home():
     st.markdown("###### 2. 결과 이미지 확인 후 Download")
     st.markdown("###### 3. 해당 이미지 사용으로 딥페이크 방어")
     st.markdown("\n")
-    image_1 = Image.open('/Users/PKNU/Desktop/project/5.png')
-    image_2 = Image.open('/Users/PKNU/Desktop/project/5.png')
+    image_1 = Image.open('5.png')
+    image_2 = Image.open('5.png')
 
     col1, col2 = st.columns(2)
 
