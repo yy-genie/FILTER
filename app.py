@@ -179,8 +179,12 @@ def show_home():
     st.markdown("###### 2. 결과 이미지 확인 후 Download")
     st.markdown("###### 3. 해당 이미지 사용으로 딥페이크 방어")
     st.markdown("\n")
-    image_1 = Image.open('5.png')
-    image_2 = Image.open('5.png')
+    
+    try:
+        image_1 = Image.open('3bbe018c-4376-4f5c-978c-0ba6b3c9713e.png')  # 업로드한 이미지로 변경
+        image_2 = Image.open('5.png')  # 기존 이미지 경로
+    except FileNotFoundError:
+        st.error("이미지 파일을 찾을 수 없습니다. 경로를 확인하세요.")
 
     col1, col2 = st.columns(2)
 
